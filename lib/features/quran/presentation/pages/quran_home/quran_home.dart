@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:quran_app/core/constants/dictionary.dart';
 import 'package:quran_app/features/quran/presentation/bloc/quran_list/quran_list_bloc.dart';
@@ -29,6 +30,14 @@ class QuranHome extends StatelessWidget {
         splashColor: Theme.of(context).colorScheme.secondaryContainer,
         onPressed: () {},
       ),
+      actions: [
+    IconButton(
+      icon: const Icon(Icons.search),
+      onPressed: () {
+        context.push('/search'); // Navigasi ke halaman pencarian
+      },
+    ),
+  ],
     );
   }
 

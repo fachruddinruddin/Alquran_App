@@ -18,42 +18,48 @@ import 'package:quran_app/features/quran/presentation/bloc/quran_settings/quran_
 import 'package:quran_app/features/quran/presentation/bloc/quran_ayah/quran_ayah_bloc.dart';
 import 'package:quran_app/features/quran/presentation/bloc/quran_list/quran_list_bloc.dart';
 import 'package:quran_app/features/quran/presentation/bloc/quran_tafsir/quran_tafsir_bloc.dart';
+import 'package:quran_app/features/quran/presentation/bloc/quran_search/quran_search_bloc.dart';
 
 final locator = GetIt.instance;
 
 Future<void> initializeDependencies() async {
-  //Hive
+  // Initialize Hive
   Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
-  locator.registerLazySingleton(
-    () => Hive.box(name: 'quran'),
-  );
+  locator.registerLazySingleton(() => Hive.box(name: 'quran'));
 
-  // Dio
+  // Dio for HTTP requests
   locator.registerLazySingleton<Dio>(() => Dio());
 
-  // Data
-  locator.registerSingleton<QuranApiService>(QuranApiService(locator()));
-  locator.registerSingleton<QuranLocalDataSource>(
-      QuranLocalDataSourceImpl(locator()));
+  // API Service
+  locator.registerLazySingleton<QuranApiService>(
+    () => QuranApiService(locator<Dio>()),
+  );
 
-  locator.registerSingleton<QuranRepository>(
-      QuranRepositoryImpl(locator(), locator()));
+  // Data Sources
+  locator.registerLazySingleton<QuranLocalDataSource>(
+    () => QuranLocalDataSourceImpl(locator()),
+  );
 
-  // UseCases
-  locator
-      .registerSingleton<GetQuranListUseCase>(GetQuranListUseCase(locator()));
-  locator
-      .registerSingleton<GetQuranAyahUseCase>(GetQuranAyahUseCase(locator()));
-  locator.registerSingleton<GetQuranTafsirUseCase>(
-      GetQuranTafsirUseCase(locator()));
-  locator.registerSingleton<GetQuranSettingsUseCase>(
-      GetQuranSettingsUseCase(locator()));
-  locator.registerSingleton<SetQuranSettingsUseCase>(
-      SetQuranSettingsUseCase(locator()));
-  locator
-      .registerSingleton<AddToLastReadUseCase>(AddToLastReadUseCase(locator()));
-  locator.registerSingleton<GetQuranLastReadUseCase>(
-      GetQuranLastReadUseCase(locator()));
+  // Repository
+  locator.registerLazySingleton<QuranRepository>(
+    () => QuranRepositoryImpl(locator(), locator()),
+  );
+
+  // Use Cases
+  locator.registerLazySingleton<GetQuranListUseCase>(
+      () => GetQuranListUseCase(locator()));
+  locator.registerLazySingleton<GetQuranAyahUseCase>(
+      () => GetQuranAyahUseCase(locator()));
+  locator.registerLazySingleton<GetQuranTafsirUseCase>(
+      () => GetQuranTafsirUseCase(locator()));
+  locator.registerLazySingleton<GetQuranSettingsUseCase>(
+      () => GetQuranSettingsUseCase(locator()));
+  locator.registerLazySingleton<SetQuranSettingsUseCase>(
+      () => SetQuranSettingsUseCase(locator()));
+  locator.registerLazySingleton<AddToLastReadUseCase>(
+      () => AddToLastReadUseCase(locator()));
+  locator.registerLazySingleton<GetQuranLastReadUseCase>(
+      () => GetQuranLastReadUseCase(locator()));
 
   // Blocs
   locator.registerFactory<QuranListBloc>(() => QuranListBloc(locator()));
@@ -63,4 +69,9 @@ Future<void> initializeDependencies() async {
       () => QuranSettingsBloc(locator(), locator()));
   locator.registerFactory<QuranLastReadBloc>(
       () => QuranLastReadBloc(locator(), locator()));
+
+  // QuranSearchBloc
+  locator.registerFactory<QuranSearchBloc>(
+    () => QuranSearchBloc(locator<QuranApiService>()),
+  );
 }
